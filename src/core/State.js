@@ -34,6 +34,7 @@ export function createDefaultState() {
     heroInventory: [],
     heroEquipment: Object.fromEntries(HERO_ITEM_SLOTS.map(({ id }) => [id, null])),
     boostLeft: 0,      // seconds of Hızlandırma left (config/rewards.js)
+    fastLeft: 0,       // seconds of ad-bought 3x speed left (config/rewards.js SPEED)
     vipNext: null,     // playTime of the VIP Elçi's next visit
     coachStep: 0,      // first-minutes hints (ui/Coach.js)
     oath: 'none',      // Yemin sworn for this run (config/oaths.js)

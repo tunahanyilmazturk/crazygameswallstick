@@ -206,8 +206,7 @@ eşya bildirimi, öldürme serisi çağrıları (10/25/50/100/200), patron ölü
 kale ilk kez ≈ dalga 25'te düşer, ilk oyun ≈ dalga 60'ta tıkanır (~80 dk); ilk Yeniden Doğuş sonrası ≈ dalga 90.
 
 **Zorluk ayarı (v0.13):** Dalga 12'den sonra düşman canı dalga başına +%3,5, hasarı +%1,5 ek büyür; patron canı `bossHpMult` ile 1 + %2,5 × dalga
-katına çıkar. Ruh geliştirmeleri pahalandı, Ruh Taşı kazancı 1/4'e indi (eski 1/3), Kadim Hafıza %2/sv. 3x oyun hızı ilk Yeniden Doğuş'ta ya da
-Hızlandırma sırasında açılır. Simülasyon (1x, bot eşya kullanmaz): ilk yolculuk dalga 39, altıncı yolculuk dalga 73 civarında durur.
+katına çıkar. Ruh geliştirmeleri pahalandı, Ruh Taşı kazancı 1/4'e indi (eski 1/3), Kadim Hafıza %2/sv. 2x dalga 10'dan sonra açılır; 3x yalnızca reklamla, her reklam 15 dakika verir. Simülasyon (1x, bot eşya kullanmaz): ilk yolculuk dalga 39, altıncı yolculuk dalga 73 civarında durur.
 
 ## Atmosfer
 - Siluet çöp adamlar, paralaks dağlar, bulutlar, kuşlar

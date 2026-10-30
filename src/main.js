@@ -42,7 +42,7 @@ const modalRoot = document.getElementById('modal-root');
 initTooltips();
 const game = new Game(canvas, state);
 const heroWindow = new HeroWindow(modalRoot, game);
-const hud = new HUD(document.getElementById('hud'), game, { onSettings: () => menu.open('pause'), onOpenSkills: () => shop.setTab('skills'), onOpenHero: () => heroWindow.open(), onBoost: () => offers.openBoost() });
+const hud = new HUD(document.getElementById('hud'), game, { onSettings: () => menu.open('pause'), onOpenSkills: () => shop.setTab('skills'), onOpenHero: () => heroWindow.open(), onBoost: () => offers.openBoost(), onFast: () => offers.openFast() });
 const shop = new ShopPanel(document.getElementById('panel'), game, { onPrestige: confirmPrestige, onOpenInventory: () => heroWindow.open(), onHelp: () => openGuide() });
 const toasts = new Toasts();
 const offers = new Offers(modalRoot, game, (t) => toasts.show(t));
@@ -160,7 +160,14 @@ resize();
 initCameraControls(canvas, game);
 window.addEventListener('pointerdown', () => game.audio.unlock(), { once: true });
 window.addEventListener('keydown', (e) => {
-  if (e.key >= '1' && e.key <= '3') state.settings.speed = Number(e.key);
+  if (e.key >= '1' && e.key <= '3') {
+    const v = Number(e.key);
+    if (v > game.speedLimit) {
+      if (v === 3) offers.openFast();
+      return;
+    }
+    state.settings.speed = v;
+  }
 });
 
 let shopTimer = 0;

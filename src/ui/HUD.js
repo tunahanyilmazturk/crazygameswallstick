@@ -3,6 +3,8 @@ import { tip } from './Tooltip.js';
 import { SkillBar, gemTip } from './SkillBar.js';
 import { fmt, pct } from '../utils/format.js';
 import { isBossWave } from '../config/enemies.js';
+import { SPEED } from '../config/rewards.js';
+import { platform } from '../platform/platform.js';
 import { saveState } from '../core/State.js';
 import { iconNode } from './icons.js';
 import { tr } from '../i18n/i18n.js';
@@ -16,8 +18,9 @@ import { tr } from '../i18n/i18n.js';
  * The castle health bar is drawn in the world above the castle (render/castleBar.js).
  */
 export class HUD {
-  constructor(root, game, { onSettings, onOpenSkills, onOpenHero, onBoost }) {
+  constructor(root, game, { onSettings, onOpenSkills, onOpenHero, onBoost, onFast }) {
     this.onBoost = onBoost;
+    this.onFast = onFast;
     this.game = game;
 
     root.append(
@@ -103,14 +106,33 @@ export class HUD {
 
   // ---- top-right: controls --------------------------------------------------------
 
+  /** A locked 3x opens the ad window; a locked 2x explains itself and does nothing. */
+  pickSpeed(v) {
+    const g = this.game;
+    if (v > g.speedLimit) {
+      if (v === 3) this.onFast?.();
+      return;
+    }
+    g.state.settings.speed = v;
+  }
+
+  speedTip(v) {
+    const g = this.game;
+    if (v <= g.speedLimit) return tr('Oyun hızı {0}x (kısayol: {1})', v, v);
+    if (v === 2) return tr('2x hız dalga {0}\'dan sonra açılır', SPEED.wave2);
+    return platform.adsOn
+      ? tr('3x hız için reklam izle: {0} dk', SPEED.fastSeconds / 60)
+      : tr('3x hız reklamla açılır');
+  }
+
   buildControls(onSettings, onOpenHero) {
     const g = this.game;
     const s = g.state;
     this.speedBtns = [1, 2, 3].map((v) => tip(h('button.seg', {
       'aria-label': tr('Oyun hızını {0}x yap', v),
       'aria-pressed': String(s.settings.speed === v),
-      onclick: () => { s.settings.speed = v; },
-    }, `${v}x`), () => (v > g.speedLimit ? tr('3x hız ilk Yeniden Doğuş\'ta ya da Hızlandırma sırasında açılır') : tr('Oyun hızı {0}x (kısayol: {1})', v, v))));
+      onclick: () => this.pickSpeed(v),
+    }, `${v}x`), () => this.speedTip(v)));
     this.advIcon = h('span');
     this.advLabel = h('span.ctl-label');
     this.advBtn = tip(h('button.ctl', { 'aria-pressed': String(s.settings.autoAdvance), onclick: () => { s.settings.autoAdvance = !s.settings.autoAdvance; } }, this.advIcon, this.advLabel), () => ({
@@ -128,7 +150,7 @@ export class HUD {
     } }), () => tr('Ses: <b>{0}</b>', s.settings.sound ? tr('Açık') : tr('Kapalı')));
     this.boostText = h('span.ctl-label');
     this.boostBtn = tip(h('button.ctl.boost-open', { 'aria-label': tr('Hızlandırma'), onclick: this.onBoost }, h('span', '⚡'), this.boostText), () => ({
-      title: tr('Hızlandırma'), desc: tr('30 dakika x2 altın, +%25 saldırı hızı ve 3x oyun hızı. Seçeneklerini görmek için tıkla.'),
+      title: tr('Hızlandırma'), desc: tr('30 dakika x2 altın ve +%25 saldırı hızı. Seçeneklerini görmek için tıkla.'),
     }));
     this.heroCount = h('span.hud-hero-count');
     this.heroBtn = tip(h('button.ctl.hero-open', { 'aria-label': tr('Kahraman penceresini aç'), onclick: onOpenHero }, iconNode('🏹', 'control-art', 'bow'), h('span.ctl-label', tr('Kahraman')), this.heroCount), tr('Kahraman penceresi, envanter ve kuşanılan eşyalar'));
@@ -222,7 +244,7 @@ export class HUD {
     // Controls
     this.speedBtns.forEach((b, i) => {
       const selected = g.gameSpeed === i + 1;
-      b.disabled = i + 1 > g.speedLimit;
+      toggleClass(b, 'locked', i + 1 > g.speedLimit);
       toggleClass(b, 'on', selected);
       b.setAttribute('aria-pressed', String(selected));
     });

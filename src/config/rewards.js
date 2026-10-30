@@ -26,6 +26,16 @@ export const VIP = {
   minGold: 200,
 };
 
+/**
+ * Oyun hızı: 2x opens at wave `wave2` of a run. 3x is never earned by playing; each ad
+ * watched gives `fastSeconds` of it, and the stock can stack up to `maxSeconds`.
+ */
+export const SPEED = {
+  wave2: 10,
+  fastSeconds: 900,
+  maxSeconds: 3600,
+};
+
 /** Yenilgi Ganimeti: after the castle falls, an ad can turn the setback into gold. */
 export const FALL_RELIEF = {
   firstAfter: 300,   // seconds of play before it can show

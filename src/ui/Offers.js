@@ -3,7 +3,7 @@ import { showModal } from './Modal.js';
 import { fmt, fmtTime } from '../utils/format.js';
 import { saveState } from '../core/State.js';
 import { platform } from '../platform/platform.js';
-import { BOOST, FALL_RELIEF, VIP } from '../config/rewards.js';
+import { BOOST, FALL_RELIEF, SPEED, VIP } from '../config/rewards.js';
 import { tr } from '../i18n/i18n.js';
 
 const NO_AD = tr('Şu an reklam yok, biraz sonra yine dene.');
@@ -70,7 +70,7 @@ export class Offers {
     s.boostLeft = BOOST.seconds;
     saveState(s);
     this.game.audio.play('charge');
-    this.toast({ icon: '⚡', title: tr('Hızlandırma başladı!'), sub: tr('30 dk: x{0} altın, +%{1} saldırı hızı, 3x hız', BOOST.gold, Math.round((BOOST.rate - 1) * 100)) });
+    this.toast({ icon: '⚡', title: tr('Hızlandırma başladı!'), sub: tr('30 dk: x{0} altın, +%{1} saldırı hızı', BOOST.gold, Math.round((BOOST.rate - 1) * 100)) });
   }
 
   openBoost() {
@@ -96,7 +96,7 @@ export class Offers {
       },
     });
     choices.push({ label: tr('Vazgeç'), run: (close) => close() });
-    this.window(tr('⚡ Hızlandırma'), tr('30 dakika boyunca düşmanlardan x{0} altın, +%{1} saldırı hızı ve 3x oyun hızı. Süre yalnızca oynarken işler.', BOOST.gold, Math.round((BOOST.rate - 1) * 100)), choices);
+    this.window(tr('⚡ Hızlandırma'), tr('30 dakika boyunca düşmanlardan x{0} altın ve +%{1} saldırı hızı. Süre yalnızca oynarken işler.', BOOST.gold, Math.round((BOOST.rate - 1) * 100)), choices);
   }
 
   grantGems(n) {
@@ -104,6 +104,31 @@ export class Offers {
     game.addGems(n);
     saveState(game.state);
     this.toast({ icon: '💠', title: tr('+{0} Elmas', n), sub: tr('VIP Elçi teşekkür etti') });
+  }
+
+  /** 3x speed, bought only with ads: each one adds time, up to the cap. */
+  openFast() {
+    const s = this.game.state;
+    if (!platform.adsOn) return;
+    const left = s.fastLeft ?? 0;
+    const intro = tr('Reklam izledikçe {0} dakika 3x oyun hızı kazanırsın. Süre yalnızca oynarken işler. En fazla {1} dakika birikir.', SPEED.fastSeconds / 60, SPEED.maxSeconds / 60);
+    this.window(tr('⏩ 3x Hız'), left > 0 ? tr('Şu an {0} 3x hız var. ', fmtTime(left)) + intro : intro, [
+      {
+        label: tr('🎬 Reklam izle: +{0} dk 3x', SPEED.fastSeconds / 60),
+        disabled: left >= SPEED.maxSeconds,
+        run: (close, note) => this.watch(close, note, () => this.grantFast()),
+      },
+      { label: tr('Vazgeç'), run: (close) => close() },
+    ]);
+  }
+
+  grantFast() {
+    const s = this.game.state;
+    s.fastLeft = Math.min(SPEED.maxSeconds, (s.fastLeft ?? 0) + SPEED.fastSeconds);
+    s.settings.speed = 3;
+    saveState(s);
+    this.game.audio.play('charge');
+    this.toast({ icon: '⏩', title: tr('3x hız açıldı!'), sub: tr('+{0} dk 3x oyun hızı', SPEED.fastSeconds / 60) });
   }
 
   /** Shown after a fall: an ad turns the setback into gold. Skipped when ads are off. */

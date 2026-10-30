@@ -5,6 +5,7 @@ import { computeStats } from '../systems/Stats.js';
 import { WaveManager } from '../systems/WaveManager.js';
 import { frontmost, densest } from '../systems/Targeting.js';
 import { waveScaling, ENEMY_TYPES, isBossWave, bossForWave } from '../config/enemies.js';
+import { SPEED } from '../config/rewards.js';
 import { ACHIEVEMENTS, gloryPoints, gloryRank, medalOf } from '../config/achievements.js';
 import { soulsForWave, UPGRADE_BY_ID } from '../config/upgrades.js';
 import { Background } from '../render/Background.js';
@@ -150,9 +151,10 @@ export class Game {
     this.cam.goto = clamp(offset, 0, this.cam.max);
   }
 
-  /** 3x is earned: it opens with the first Yeniden Doğuş, or while Hızlandırma runs. */
+  /** 2x opens at wave 10 of a run; 3x exists only while ad-bought time is left. */
   get speedLimit() {
-    return this.state.prestiges > 0 || this.state.boostLeft > 0 ? 3 : 2;
+    if ((this.state.fastLeft ?? 0) > 0) return 3;
+    return this.state.maxWave >= SPEED.wave2 ? 2 : 1;
   }
 
   get gameSpeed() {
@@ -246,6 +248,10 @@ export class Game {
     this.vip.update(dt, this);
     // Hızlandırma counts real playing time, whatever the game speed
     if (s.boostLeft > 0) s.boostLeft = Math.max(0, s.boostLeft - dt / this.gameSpeed);
+    if ((s.fastLeft ?? 0) > 0) {
+      s.fastLeft = Math.max(0, s.fastLeft - dt / this.gameSpeed);
+      if (s.fastLeft === 0 && s.settings.speed > this.speedLimit) s.settings.speed = this.speedLimit;
+    }
     if (this.aim && this.hero.manualShot(this, this.aim.x, this.aim.y)) {
       this.count('manualShots');
       this.lastManual = this.time;
