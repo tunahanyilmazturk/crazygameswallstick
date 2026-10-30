@@ -18,7 +18,7 @@ import { getHeroItemRarity, getHeroItemTemplate, describeSetBonus } from './syst
 import { fmt, fmtTime } from './utils/format.js';
 import { soulsForWave } from './config/upgrades.js';
 import { isBossWave } from './config/enemies.js';
-import { MIDGAME } from './config/rewards.js';
+import { FALL_RELIEF, MIDGAME } from './config/rewards.js';
 import { platform } from './platform/platform.js';
 import { Offers } from './ui/Offers.js';
 import { Coach } from './ui/Coach.js';
@@ -64,9 +64,20 @@ game.onWaveBreak = (wave) => {
     },
     onEnd: () => {
       game.paused = false;
-      game.audio.muted = false;
+      game.audio.muted = platform.siteMuted;
     },
   });
+};
+/** Yenilgi Ganimeti, a little after a fall so the banner is read first; capped by play time. */
+let lastFallRelief = -Infinity;
+game.onCastleFell = () => {
+  setTimeout(() => {
+    const s = state;
+    if (!platform.adsOn || s.playTime < FALL_RELIEF.firstAfter) return;
+    if (s.playTime - lastFallRelief < FALL_RELIEF.every || game.paused || menu.isOpen || offers.open) return;
+    lastFallRelief = s.playTime;
+    offers.openFallRelief();
+  }, FALL_RELIEF.delayMs);
 };
 /** Announces a new Şan rank across the top of the field; clicks pass through it. */
 function showRankUp(rank) {

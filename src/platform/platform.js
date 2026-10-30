@@ -15,6 +15,7 @@ export const ADS_LIVE = false;
 let sdk = null;
 let environment = 'none';
 let playing = false;
+let siteMuted = false;
 
 function loadScript() {
   return new Promise((resolve) => {
@@ -55,6 +56,11 @@ export const platform = {
     return !!sdk && (environment === 'local' || ADS_LIVE);
   },
 
+  /** The player's mute choice on CrazyGames; an ad must hand audio back in this state. */
+  get siteMuted() {
+    return siteMuted;
+  },
+
   get locale() {
     return safely(() => sdk.user.systemInfo.locale) ?? navigator.language ?? 'en';
   },
@@ -82,9 +88,13 @@ export const platform = {
 
   /** Calls `fn(muted)` now and whenever the site's mute setting changes. */
   watchMute(fn) {
+    const apply = (muted) => {
+      siteMuted = muted;
+      fn(muted);
+    };
     safely(() => {
-      fn(!!sdk.game.settings.muteAudio);
-      sdk.game.addSettingsChangeListener((settings) => fn(!!settings.muteAudio));
+      apply(!!sdk.game.settings.muteAudio);
+      sdk.game.addSettingsChangeListener((settings) => apply(!!settings.muteAudio));
     });
   },
 

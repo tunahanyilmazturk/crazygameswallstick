@@ -829,6 +829,7 @@ export class Game {
     this.outerWall.rebuild(this, true);
     for (const so of this.soldiers) { so.alive = true; so.hp = so.maxHp; }
     saveState(s);
+    this.onCastleFell?.(back);
   }
 
   /**

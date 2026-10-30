@@ -54,3 +54,4 @@ Bu ayar açılınca Hızlandırma ve VIP Elçi pencerelerinde "Reklam izle" seç
 - Hızlandırma: 30 dk, x2 altın, +%25 saldırı hızı, 3x oyun hızı, reklamsız bedeli 2 Elmas
 - VIP Elçi: 12 dakikada bir, reklamla 2 Elmas, altınla 1 Elmas
 - Ara reklam: 15. dakikadan sonra, yalnızca patron dalgası bitince, en az 7 dakika arayla
+- Yenilgi Ganimeti: kale düşünce, 5. dakikadan sonra, en az 10 dakika arayla, reklamla ganimet (2 dakikalık gelir)

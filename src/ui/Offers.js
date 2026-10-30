@@ -3,10 +3,11 @@ import { showModal } from './Modal.js';
 import { fmt, fmtTime } from '../utils/format.js';
 import { saveState } from '../core/State.js';
 import { platform } from '../platform/platform.js';
-import { BOOST, VIP } from '../config/rewards.js';
+import { BOOST, FALL_RELIEF, VIP } from '../config/rewards.js';
 import { tr } from '../i18n/i18n.js';
 
 const NO_AD = tr('Şu an reklam yok, biraz sonra yine dene.');
+const AD_BLOCKED = tr('Reklam engelleyici açık görünüyor. Kapatıp tekrar dene.');
 
 /**
  * The windows that offer Hızlandırma and the VIP Elçi. They pause the game, so a video
@@ -52,10 +53,10 @@ export class Offers {
     const { game } = this;
     platform.showAd('rewarded', {
       onStart: () => { game.audio.muted = true; },
-      onEnd: (ok) => {
-        game.audio.muted = false;
+      onEnd: (ok, code) => {
+        game.audio.muted = platform.siteMuted;
         if (!ok) {
-          note.textContent = NO_AD;
+          note.textContent = code === 'adblock' ? AD_BLOCKED : NO_AD;
           return;
         }
         close();
@@ -103,6 +104,25 @@ export class Offers {
     game.addGems(n);
     saveState(game.state);
     this.toast({ icon: '💠', title: tr('+{0} Elmas', n), sub: tr('VIP Elçi teşekkür etti') });
+  }
+
+  /** Shown after a fall: an ad turns the setback into gold. Skipped when ads are off. */
+  openFallRelief() {
+    const { game } = this;
+    const s = game.state;
+    if (!platform.adsOn) return;
+    const gold = Math.max(FALL_RELIEF.minGold, Math.round(s.goldPerSec * FALL_RELIEF.goldSeconds));
+    this.window(tr('🛡️ Yenilgi Ganimeti'), tr('Kale düştü ama surlar yeniden kuruldu. Reklam izlersen {0} altın ganimet alırsın.', fmt(gold)), [
+      {
+        label: tr('🎬 Reklam izle: +{0} altın', fmt(gold)),
+        run: (close, note) => this.watch(close, note, () => {
+          game.addGold(gold);
+          saveState(s);
+          this.toast({ icon: '🛡️', title: tr('Ganimet toplandı!'), sub: tr('Yenilgiden {0} altın kurtardın', fmt(gold)) });
+        }),
+      },
+      { label: tr('Geç'), run: (close) => close() },
+    ]);
   }
 
   openVip() {

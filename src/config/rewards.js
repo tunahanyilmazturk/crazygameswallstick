@@ -26,6 +26,15 @@ export const VIP = {
   minGold: 200,
 };
 
+/** Yenilgi Ganimeti: after the castle falls, an ad can turn the setback into gold. */
+export const FALL_RELIEF = {
+  firstAfter: 300,   // seconds of play before it can show
+  every: 600,        // seconds of play between offers
+  goldSeconds: 120,  // this many seconds of current income
+  minGold: 100,
+  delayMs: 1800,     // lets the "Kale Düştü!" banner be read first
+};
+
 /** Ara reklam: only after a boss wave, and never in a player's first minutes. */
 export const MIDGAME = {
   firstAfter: 900,
