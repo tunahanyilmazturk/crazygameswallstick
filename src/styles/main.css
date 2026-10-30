@@ -1829,3 +1829,5 @@ button:focus-visible, [role="dialog"]:focus-visible {
   .inv-slot { width: 44px; height: 44px; }
   .inv-slot small, .inv-legend, .inv-character h4, .inv-stat-list, .inv-character .inv-muted { display: none; }
 }
+
+.seg:disabled { opacity: 0.38; cursor: default; }

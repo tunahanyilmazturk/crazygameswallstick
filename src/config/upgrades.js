@@ -252,22 +252,22 @@ export const VILLAGE_UPGRADES = VILLAGE_SITES.flatMap(({ key: site, building: b,
 export const SOUL_UPGRADES = [
   {
     id: 'soulPower', currency: 'souls', name: tr('Kadim Güç'), icon: '⚔️', desc: tr('Kahraman ve tüm birliklerin hasarı'),
-    baseCost: 1, growth: 1.25,
+    baseCost: 1, growth: 1.34,
     stat: (l) => 1 + 0.15 * l,
     describe: (v) => tr('x{0} hasar', v.toFixed(2)),
     short: (v) => `x${v.toFixed(2)}`,
   },
   {
     id: 'soulGold', currency: 'souls', name: tr('Altın Ruhu'), icon: '👑', desc: tr('Kazanılan tüm altın'),
-    baseCost: 1, growth: 1.3,
-    stat: (l) => 1 + 0.2 * l,
+    baseCost: 1, growth: 1.4,
+    stat: (l) => 1 + 0.15 * l,
     describe: (v) => tr('x{0} altın', v.toFixed(2)),
     short: (v) => `x${v.toFixed(2)}`,
   },
   {
     id: 'soulWalls', currency: 'souls', name: tr('Yıkılmaz Surlar'), icon: '🏯', desc: tr('Kale canı, yenilenme ve şifa'),
     info: tr('Asker canı ve Şifacı şifasını da artırır.'),
-    baseCost: 2, growth: 1.3,
+    baseCost: 2, growth: 1.36,
     stat: (l) => 1 + 0.2 * l,
     describe: (v) => tr('x{0} dayanıklılık', v.toFixed(2)),
     short: (v) => `x${v.toFixed(2)}`,
@@ -319,8 +319,8 @@ export const SOUL_UPGRADES = [
   },
   {
     id: 'soulVillage', currency: 'souls', name: tr('Köy Bereketi'), icon: '🌻', desc: tr('Köy geliri kalıcı olarak artar'),
-    baseCost: 2, growth: 1.4,
-    stat: (l) => 1 + 0.15 * l,
+    baseCost: 3, growth: 1.5,
+    stat: (l) => 1 + 0.1 * l,
     describe: (v) => tr('x{0} köy geliri', v.toFixed(2)),
     short: (v) => `x${v.toFixed(2)}`,
   },
@@ -358,7 +358,7 @@ export const SOUL_UPGRADES = [
     id: 'soulMemory', currency: 'souls', name: tr('Kadim Hafıza'), icon: '🔮', desc: tr('Yeniden doğunca altın geliştirmelerinin bir kısmı korunur'),
     info: tr('Her geliştirmenin seviyesinin bu oranı yeni yolculuğa taşınır. Kuleler ve birlikler de dahildir.'),
     baseCost: 8, growth: 1.8, max: 10,
-    stat: (l) => 0.03 * l,
+    stat: (l) => 0.02 * l,
     describe: (v) => (v ? tr('seviyelerin {0}\'i kalır', pct(v)) : tr('Yok')),
     short: (v) => (v ? pct(v) : tr('Yok')),
   },
@@ -369,7 +369,7 @@ export const PRESTIGE_MIN_WAVE = 20;
 /** Ruh Taşı earned by a prestige that reached `maxWave` (mult: Ruh Hasadı bonus). */
 export function soulsForWave(maxWave, mult = 1) {
   if (maxWave < PRESTIGE_MIN_WAVE) return 0;
-  return Math.floor((Math.pow(maxWave - 14, 1.3) / 3) * mult);
+  return Math.floor((Math.pow(maxWave - 14, 1.3) / 4) * mult);
 }
 
 /** First wave that would raise the prestige reward above what `maxWave` gives. */

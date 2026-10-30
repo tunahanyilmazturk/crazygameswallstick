@@ -150,6 +150,15 @@ export class Game {
     this.cam.goto = clamp(offset, 0, this.cam.max);
   }
 
+  /** 3x is earned: it opens with the first Yeniden Doğuş, or while Hızlandırma runs. */
+  get speedLimit() {
+    return this.state.prestiges > 0 || this.state.boostLeft > 0 ? 3 : 2;
+  }
+
+  get gameSpeed() {
+    return Math.min(this.state.settings.speed, this.speedLimit);
+  }
+
   /** Runs on real (not game-speed) time so panning works the same at 1x–3x. */
   updateCamera(dt) {
     const c = this.cam;
@@ -202,7 +211,7 @@ export class Game {
       // Slow motion holds at 30% and eases back to full speed over its last 0.3 s
       const timeScale = this.slowT > 0.3 ? 0.3 : 0.3 + 0.7 * (1 - this.slowT / 0.3);
       // The main menu pauses the world; the camera and drawing keep going behind it
-      acc = this.paused ? 0 : acc + dt * this.state.settings.speed * timeScale;
+      acc = this.paused ? 0 : acc + dt * this.gameSpeed * timeScale;
       let steps = 0;
       while (acc >= FIXED_DT && steps < 40) {
         this.update(FIXED_DT);
@@ -236,7 +245,7 @@ export class Game {
     this.pet.update(dt, this);
     this.vip.update(dt, this);
     // Hızlandırma counts real playing time, whatever the game speed
-    if (s.boostLeft > 0) s.boostLeft = Math.max(0, s.boostLeft - dt / s.settings.speed);
+    if (s.boostLeft > 0) s.boostLeft = Math.max(0, s.boostLeft - dt / this.gameSpeed);
     if (this.aim && this.hero.manualShot(this, this.aim.x, this.aim.y)) {
       this.count('manualShots');
       this.lastManual = this.time;

@@ -205,6 +205,10 @@ eşya bildirimi, öldürme serisi çağrıları (10/25/50/100/200), patron ölü
 çalıştırır ve dalga kilometre taşlarını yazar. Hedef eğri (mevcut değerler): dalga 10 ≈ 3 dk, dalga 20 ≈ 12 dk,
 kale ilk kez ≈ dalga 25'te düşer, ilk oyun ≈ dalga 60'ta tıkanır (~80 dk); ilk Yeniden Doğuş sonrası ≈ dalga 90.
 
+**Zorluk ayarı (v0.13):** Dalga 12'den sonra düşman canı dalga başına +%3,5, hasarı +%1,5 ek büyür; patron canı `bossHpMult` ile 1 + %2,5 × dalga
+katına çıkar. Ruh geliştirmeleri pahalandı, Ruh Taşı kazancı 1/4'e indi (eski 1/3), Kadim Hafıza %2/sv. 3x oyun hızı ilk Yeniden Doğuş'ta ya da
+Hızlandırma sırasında açılır. Simülasyon (1x, bot eşya kullanmaz): ilk yolculuk dalga 39, altıncı yolculuk dalga 73 civarında durur.
+
 ## Atmosfer
 - Siluet çöp adamlar, paralaks dağlar, bulutlar, kuşlar
 - Dalgaya göre gündüz → gün batımı → gece döngüsü, patronda kızıl ay
@@ -275,7 +279,7 @@ src/
 | Köy | Un Değirmeni + Değirmenci | 4. tesis (yel değirmeni), 450/sn işçi başı |
 | Köy | Taş Ocağı + Taş Ustası | 5. tesis; taş ustaları kale onarımını destekler |
 | Köy | Pazar Yeri | Tüm köy geliri +%8/sv |
-| Ruh | Ruh Hasadı / Hızlı Başlangıç / Kutsal Oklar / Köy Bereketi | +%10 Ruh Taşı · Dalga 1+2·sv'den başla · +%2 kritik · +%15 köy geliri |
+| Ruh | Ruh Hasadı / Hızlı Başlangıç / Kutsal Oklar / Köy Bereketi | +%10 Ruh Taşı · Dalga 1+2·sv'den başla · +%2 kritik · +%10 köy geliri |
 
 Simülasyon (bot): ilk oyun ≈ dalga 70, ilk Yeniden Doğuş sonrası ≈ dalga 98.
 
@@ -328,20 +332,20 @@ kazık ve iple çevrilidir; binanın soluk taslağı görünür.
 
 ## Prestij — Ruh Taşları
 Dalga 20'ye ulaşınca **Yeniden Doğuş** açılır: altın, dalga ve altınla alınan tüm geliştirmeler sıfırlanır,
-karşılığında `floor((enYüksekDalga − 14)^1.3 / 3)` Ruh Taşı (💎) kazanılır (Dalga 20 → 3, Dalga 40 → 22, Dalga 60 → 47).
+karşılığında `floor((enYüksekDalga − 14)^1.3 / 4)` Ruh Taşı (💎) kazanılır (Dalga 20 → 2, Dalga 40 → 17, Dalga 60 → 36).
 Ruh Taşları ve Ruh geliştirmeleri kalıcıdır:
 
 | Geliştirme | Etki |
 |---|---|
 | Kadim Güç | Tüm hasar +%15/sv |
-| Altın Ruhu | Tüm altın +%20/sv |
+| Altın Ruhu | Tüm altın +%15/sv |
 | Yıkılmaz Surlar | Kale canı, yenilenme, asker canı ve şifa +%20/sv |
 | Savaş Ritmi | Tüm saldırı hızları +%4/sv (maks 25) |
 | Başlangıç Altını | Yeniden doğunca 50×5^sv altınla başla (maks 10) |
 | Zaman Bükücü | Çevrimdışı kazanç +%10 ve +2 saat/sv (maks 5) |
 
 Yeni geliştirmeler: Lord Katili (patronlara +%10/sv), Ganimet Kokusu (eşya şansı +%8/sv), Elmas Damarı (doğuş başı +1 Elmas/sv),
-Kadim Hafıza (altın geliştirmelerinin %3/sv'si yeni yolculuğa geçer, maks %30).
+Kadim Hafıza (altın geliştirmelerinin %2/sv'si yeni yolculuğa geçer, maks %20).
 
 **Yeminler (`config/oaths.js`):** Bir sonraki yolculuk için seçilir, Yeniden Doğuş'la başlar ve o yolculuğun Ruh Taşı kazancını artırır:
 Demir (düşman canı +%40, x1,3), Kan (kale canı -%40, x1,3), Yoksulluk (altın -%35, x1,35; 2 doğuş gerekir), Yıkım (üçü birden, x2,2; 5 doğuş

@@ -69,7 +69,7 @@ export class Offers {
     s.boostLeft = BOOST.seconds;
     saveState(s);
     this.game.audio.play('charge');
-    this.toast({ icon: '⚡', title: tr('Hızlandırma başladı!'), sub: tr('30 dk: x{0} altın, +%{1} saldırı hızı', BOOST.gold, Math.round((BOOST.rate - 1) * 100)) });
+    this.toast({ icon: '⚡', title: tr('Hızlandırma başladı!'), sub: tr('30 dk: x{0} altın, +%{1} saldırı hızı, 3x hız', BOOST.gold, Math.round((BOOST.rate - 1) * 100)) });
   }
 
   openBoost() {
@@ -95,7 +95,7 @@ export class Offers {
       },
     });
     choices.push({ label: tr('Vazgeç'), run: (close) => close() });
-    this.window(tr('⚡ Hızlandırma'), tr('30 dakika boyunca düşmanlardan x{0} altın ve +%{1} saldırı hızı. Süre yalnızca oynarken işler.', BOOST.gold, Math.round((BOOST.rate - 1) * 100)), choices);
+    this.window(tr('⚡ Hızlandırma'), tr('30 dakika boyunca düşmanlardan x{0} altın, +%{1} saldırı hızı ve 3x oyun hızı. Süre yalnızca oynarken işler.', BOOST.gold, Math.round((BOOST.rate - 1) * 100)), choices);
   }
 
   grantGems(n) {

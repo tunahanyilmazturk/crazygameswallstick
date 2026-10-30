@@ -59,13 +59,20 @@ export const spawnsOn = (def, wave) => wave >= def.minWave && (!def.regions || d
 /** Types that existed before the intro banners; older saves have already met them. */
 export const LEGACY_ENEMY_TYPES = ['grunt', 'vulture', 'runner', 'thrower', 'shield', 'brute', 'boss'];
 
+/** The first waves stay gentle for new players; the climb steepens after EASY_WAVES. */
+const EASY_WAVES = 12;
+
 export function waveScaling(wave) {
   const w = wave - 1;
+  const late = Math.max(0, wave - EASY_WAVES);
   return {
-    hp: Math.pow(1.156, w) * (1 + 0.05 * w),
-    dmg: Math.pow(1.115, w),
-    gold: Math.pow(1.08, w),
+    hp: Math.pow(1.156, w) * (1 + 0.05 * w) * Math.pow(1.035, late),
+    dmg: Math.pow(1.115, w) * Math.pow(1.015, late),
+    gold: Math.pow(1.078, w),
   };
 }
+
+/** Bosses are the walls of the climb: each one is a bigger jump than the wave around it. */
+export const bossHpMult = (wave) => 1 + 0.025 * wave;
 
 export const isBossWave = (wave) => wave % 10 === 0;

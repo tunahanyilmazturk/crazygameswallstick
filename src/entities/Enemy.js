@@ -1,4 +1,4 @@
-import { ENEMY_TYPES, waveScaling } from '../config/enemies.js';
+import { ENEMY_TYPES, waveScaling, bossHpMult } from '../config/enemies.js';
 import { GROUND_Y, SPAWN_X, WORLD_W, WALL_FRONT, INK, FLASH, GRAVITY } from '../core/constants.js';
 import { rand, ballistic } from '../utils/math.js';
 import { Projectile } from './Projectile.js';
@@ -17,7 +17,7 @@ export class Enemy {
     const sc = waveScaling(wave);
     this.type = type;
     this.def = def;
-    this.maxHp = def.hp * sc.hp * hpMult;
+    this.maxHp = def.hp * sc.hp * hpMult * (def.boss ? bossHpMult(wave) : 1);
     this.hp = this.maxHp;
     this.damage = def.damage * sc.dmg;
     this.gold = def.gold * sc.gold;

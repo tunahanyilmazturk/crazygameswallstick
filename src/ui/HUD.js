@@ -110,7 +110,7 @@ export class HUD {
       'aria-label': tr('Oyun hızını {0}x yap', v),
       'aria-pressed': String(s.settings.speed === v),
       onclick: () => { s.settings.speed = v; },
-    }, `${v}x`), tr('Oyun hızı {0}x (kısayol: {1})', v, v)));
+    }, `${v}x`), () => (v > g.speedLimit ? tr('3x hız ilk Yeniden Doğuş\'ta ya da Hızlandırma sırasında açılır') : tr('Oyun hızı {0}x (kısayol: {1})', v, v))));
     this.advIcon = h('span');
     this.advLabel = h('span.ctl-label');
     this.advBtn = tip(h('button.ctl', { 'aria-pressed': String(s.settings.autoAdvance), onclick: () => { s.settings.autoAdvance = !s.settings.autoAdvance; } }, this.advIcon, this.advLabel), () => ({
@@ -128,7 +128,7 @@ export class HUD {
     } }), () => tr('Ses: <b>{0}</b>', s.settings.sound ? tr('Açık') : tr('Kapalı')));
     this.boostText = h('span.ctl-label');
     this.boostBtn = tip(h('button.ctl.boost-open', { 'aria-label': tr('Hızlandırma'), onclick: this.onBoost }, h('span', '⚡'), this.boostText), () => ({
-      title: tr('Hızlandırma'), desc: tr('30 dakika x2 altın ve +%25 saldırı hızı. Seçeneklerini görmek için tıkla.'),
+      title: tr('Hızlandırma'), desc: tr('30 dakika x2 altın, +%25 saldırı hızı ve 3x oyun hızı. Seçeneklerini görmek için tıkla.'),
     }));
     this.heroCount = h('span.hud-hero-count');
     this.heroBtn = tip(h('button.ctl.hero-open', { 'aria-label': tr('Kahraman penceresini aç'), onclick: onOpenHero }, iconNode('🏹', 'control-art', 'bow'), h('span.ctl-label', tr('Kahraman')), this.heroCount), tr('Kahraman penceresi, envanter ve kuşanılan eşyalar'));
@@ -221,7 +221,8 @@ export class HUD {
 
     // Controls
     this.speedBtns.forEach((b, i) => {
-      const selected = s.settings.speed === i + 1;
+      const selected = g.gameSpeed === i + 1;
+      b.disabled = i + 1 > g.speedLimit;
       toggleClass(b, 'on', selected);
       b.setAttribute('aria-pressed', String(selected));
     });
