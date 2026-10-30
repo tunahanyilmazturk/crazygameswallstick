@@ -4,11 +4,10 @@
  * window, because CrazyGames does not allow ad buttons on an active gameplay screen.
  */
 
-/** Hızlandırma: enemy gold and attack speed for a stretch of played time. */
+/** Hızlandırma: enemy gold for a stretch of played time. */
 export const BOOST = {
   seconds: 1800,
   gold: 2,
-  rate: 1.25,
   gems: 2,           // the price without an ad
   renewBelow: 300,   // can be taken again once this many seconds are left
 };
@@ -27,11 +26,16 @@ export const VIP = {
 };
 
 /**
- * Oyun hızı: 2x opens at wave `wave2` of a run. 3x is never earned by playing; each ad
- * watched gives `fastSeconds` of it, and the stock can stack up to `maxSeconds`.
+ * Oyun hızı. Starts at 1x; each step opens once the run reaches its wave. 3x (`fast`) is
+ * never earned by playing: each ad watched gives `fastSeconds` of it, and the stock can
+ * stack up to `maxSeconds`.
  */
 export const SPEED = {
-  wave2: 10,
+  steps: [
+    { speed: 1.5, wave: 10 },
+    { speed: 2, wave: 20 },
+  ],
+  fast: 3,
   fastSeconds: 900,
   maxSeconds: 3600,
 };

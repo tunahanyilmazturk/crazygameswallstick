@@ -43,7 +43,7 @@ const CHAPTERS = [
         [tr('Patron'), tr('Her 10. dalgada gelir. Canı %30\'un altına düşünce öfkelenir, hızlanır.')],
         [tr('Kale düşerse'), tr('2 dalga geri çekilirsin. İlerleme silinmez, kale onarılır.')],
         [tr('Tekrar / İlerle'), tr('Üstteki düğme: "Tekrar" aynı dalgada altın toplar, "İlerle" yeni dalgaya geçer.')],
-        [tr('Oyun hızı'), tr('Üstten ya da 1, 2, 3 tuşlarıyla değişir. 2x dalga 10\'dan sonra açılır, 3x için reklam izlenir.')],
+        [tr('Oyun hızı'), tr('Üstten ya da 1, 2, 3 tuşlarıyla değişir. 1.5x dalga 10 olunca, 2x dalga 20 olunca açılır. 3x için reklam izlenir.')],
       ])}
       ${tip(tr('Bir dalgada zorlanıyorsan "Tekrar"a al, biraz altın biriktirip güçlenince devam et.'))}`,
   },

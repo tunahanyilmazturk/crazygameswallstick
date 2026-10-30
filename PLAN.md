@@ -206,7 +206,7 @@ eşya bildirimi, öldürme serisi çağrıları (10/25/50/100/200), patron ölü
 kale ilk kez ≈ dalga 25'te düşer, ilk oyun ≈ dalga 60'ta tıkanır (~80 dk); ilk Yeniden Doğuş sonrası ≈ dalga 90.
 
 **Zorluk ayarı (v0.13):** Dalga 12'den sonra düşman canı dalga başına +%3,5, hasarı +%1,5 ek büyür; patron canı `bossHpMult` ile 1 + %2,5 × dalga
-katına çıkar. Ruh geliştirmeleri pahalandı, Ruh Taşı kazancı 1/4'e indi (eski 1/3), Kadim Hafıza %2/sv. 2x dalga 10'dan sonra açılır; 3x yalnızca reklamla, her reklam 15 dakika verir. Simülasyon (1x, bot eşya kullanmaz): ilk yolculuk dalga 39, altıncı yolculuk dalga 73 civarında durur.
+katına çıkar. Ruh geliştirmeleri pahalandı, Ruh Taşı kazancı 1/4'e indi (eski 1/3), Kadim Hafıza %2/sv. 1x'ten başlanır; 1.5x dalga 10'da, 2x dalga 20'de açılır. 3x yalnızca reklamla, her reklam 15 dakika verir. Simülasyon (1x, bot eşya kullanmaz): ilk yolculuk dalga 39, altıncı yolculuk dalga 73 civarında durur.
 
 ## Atmosfer
 - Siluet çöp adamlar, paralaks dağlar, bulutlar, kuşlar
@@ -238,7 +238,7 @@ aynı menüyü duraklatma menüsü olarak açar. Çevrimdışı kazanç ve ilk e
 ## Yayın ve para kazanma (`platform/platform.js`, `config/rewards.js`, `store/YAYIN-REHBERI.md`)
 `boot.js` önce SDK'ya bağlanır, dili seçer, sonra oyunu yükler. SDK yoksa oyun yerel kayıtla reklamsız çalışır.
 Metinler `tr()` ile sarılıdır; Türkçe anahtar, İngilizce `i18n/en.js` içinde. Yeni metin eklenince oraya da yazılmalı.
-**Hızlandırma:** 30 dk x2 altın ve +%25 saldırı hızı; reklam ya da 2 Elmas. **VIP Elçi:** kale penceresinde belirir; reklamla 2, altınla 1 Elmas.
+**Hızlandırma:** 30 dk x2 altın; reklam ya da 2 Elmas. **VIP Elçi:** kale penceresinde belirir; reklamla 2, altınla 1 Elmas.
 İkisi de oyunu duraklatan pencerededir, çünkü reklam düğmesi aktif oyun ekranında olamaz ve her ödülün reklamsız seçeneği olmalıdır.
 `ADS_LIVE` Full Launch'a kadar kapalı kalır. **Coach:** ilk dakikalarda adım adım ipucu; yeni oyuncu doğrudan savaşa girer.
 

@@ -36,7 +36,7 @@ export class SkillSystem {
   }
 
   get rateMult() {
-    return (this.active.warcry > 0 ? this.st('warcry')?.rate ?? 1 : 1) * (this.boosted ? BOOST.rate : 1);
+    return this.active.warcry > 0 ? this.st('warcry')?.rate ?? 1 : 1;
   }
 
   get goldMult() {

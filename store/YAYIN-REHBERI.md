@@ -51,8 +51,8 @@ CrazyGames iki video istiyor: yatay 1920x1080 ve dikey 2:3, ikisi de en fazla 20
 Bu ayar açılınca Hızlandırma ve VIP Elçi pencerelerinde "Reklam izle" seçeneği ve patron sonrası ara reklam devreye girer. Basic Launch'ta açık bırakılırsa etkisiz reklam düğmesi kuralı ihlal edilir.
 
 ## Satışı etkileyen ayarlar (`src/config/rewards.js`)
-- Hızlandırma: 30 dk, x2 altın, +%25 saldırı hızı, reklamsız bedeli 2 Elmas
-- 3x oyun hızı: yalnızca reklamla, her reklam 15 dk verir, en fazla 60 dk birikir. 2x, dalga 10'dan sonra açılır.
+- Hızlandırma: 30 dk, x2 altın, reklamsız bedeli 2 Elmas
+- 3x oyun hızı: yalnızca reklamla, her reklam 15 dk verir, en fazla 60 dk birikir. 1.5x dalga 10'da, 2x dalga 20'de açılır.
 - VIP Elçi: 12 dakikada bir, reklamla 2 Elmas, altınla 1 Elmas
 - Ara reklam: 15. dakikadan sonra, yalnızca patron dalgası bitince, en az 7 dakika arayla
 - Yenilgi Ganimeti: kale düşünce, 5. dakikadan sonra, en az 10 dakika arayla, reklamla ganimet (2 dakikalık gelir)

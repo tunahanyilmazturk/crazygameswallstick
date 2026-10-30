@@ -9,6 +9,8 @@ import { saveState } from '../core/State.js';
 import { iconNode } from './icons.js';
 import { tr } from '../i18n/i18n.js';
 
+const SPEED_STEPS = [1, 1.5, 2, 3];
+
 /*
  * Overlay on top of the canvas:
  *   top-left    resources (gold, Ruh Taşı, Elmas)
@@ -46,7 +48,7 @@ export class HUD {
     const s = g.state;
     this.goldText = h('span.res-value');
     this.gpsText = h('span.res-rate');
-    const gold = tip(h('div.res-gold', iconNode('💰', 'res-icon'), h('div.res-col', this.goldText, this.gpsText)), () => {
+    const gold = tip(h('div.res-gold', iconNode('💰', 'res-icon'), h('div.res-col', h('span.res-label', tr('Altın')), this.goldText, this.gpsText)), () => {
       const off = g.stats.soul.offline;
       return {
         icon: '💰', title: tr('Altın'), badge: fmt(s.gold),
@@ -61,12 +63,12 @@ export class HUD {
     });
     this.soulText = h('span');
     this.gemText = h('span');
-    this.soulChip = tip(h('div.res-chip.soul', iconNode('💎', 'resource-art'), this.soulText), () => ({
+    this.soulChip = tip(h('div.res-chip.soul', iconNode('💎', 'resource-art'), h('span.res-chip-name', tr('Ruh')), this.soulText), () => ({
       icon: '💎', title: tr('Ruh Taşı'), badge: fmt(s.souls),
       desc: tr('Yeniden Doğuş ile kazanılır; kalıcı Ruh geliştirmelerinde harcanır.'),
       rows: [[tr('Toplam kazanılan'), fmt(s.totalSouls)], [tr('Yeniden doğuş'), s.prestiges]],
     }));
-    this.gemChip = tip(h('div.res-chip.gem', iconNode('💠', 'resource-art'), this.gemText), () => gemTip(s));
+    this.gemChip = tip(h('div.res-chip.gem', iconNode('💠', 'resource-art'), h('span.res-chip-name', tr('Elmas')), this.gemText), () => gemTip(s));
     return h('div.hud-res.hud-panel', gold, h('div.res-row', this.soulChip, this.gemChip));
   }
 
@@ -80,12 +82,13 @@ export class HUD {
     this.waveCount = h('span.wave-count');
     this.bestChip = h('span.wave-chip');
     this.bossChip = h('span.wave-chip.boss');
+    this.boostChip = h('span.wave-chip.boost.hidden');
     this.prevBtn = tip(h('button.wave-nav', { 'aria-label': tr('Önceki dalgaya dön'), onclick: () => g.jumpToWave(s.wave - 1) }, '‹'), tr('Önceki dalgaya dön — daha kolay, altın kasmak için'));
     this.nextBtn = tip(h('button.wave-nav', { 'aria-label': tr('Sonraki dalgaya geç'), onclick: () => g.jumpToWave(s.wave + 1) }, '›'), tr('Sonraki dalgaya geç (en yüksek dalgana kadar)'));
     this.wavePanel = tip(h('div.hud-wave.hud-panel',
       h('div.wave-head', this.prevBtn, h('div.wave-title', h('span.wave-label', tr('DALGA')), this.waveText), this.nextBtn),
       h('div.wave-track', this.waveFill, this.waveCount),
-      h('div.wave-chips', this.bestChip, this.bossChip),
+      h('div.wave-chips', this.bestChip, this.bossChip, this.boostChip),
     ), () => {
       const w = g.waves;
       const nextBoss = isBossWave(s.wave) ? s.wave : Math.ceil(s.wave / 10) * 10;
@@ -110,7 +113,7 @@ export class HUD {
   pickSpeed(v) {
     const g = this.game;
     if (v > g.speedLimit) {
-      if (v === 3) this.onFast?.();
+      if (v === SPEED.fast) this.onFast?.();
       return;
     }
     g.state.settings.speed = v;
@@ -118,8 +121,9 @@ export class HUD {
 
   speedTip(v) {
     const g = this.game;
-    if (v <= g.speedLimit) return tr('Oyun hızı {0}x (kısayol: {1})', v, v);
-    if (v === 2) return tr('2x hız dalga {0}\'dan sonra açılır', SPEED.wave2);
+    if (v <= g.speedLimit) return v % 1 === 0 ? tr('Oyun hızı {0}x (kısayol: {1})', v, v) : tr('Oyun hızı {0}x', v);
+    const step = SPEED.steps.find((st) => st.speed === v);
+    if (step) return tr('{0}x hız, dalga {1} olunca açılır', v, step.wave);
     return platform.adsOn
       ? tr('3x hız için reklam izle: {0} dk', SPEED.fastSeconds / 60)
       : tr('3x hız reklamla açılır');
@@ -128,7 +132,7 @@ export class HUD {
   buildControls(onSettings, onOpenHero) {
     const g = this.game;
     const s = g.state;
-    this.speedBtns = [1, 2, 3].map((v) => tip(h('button.seg', {
+    this.speedBtns = SPEED_STEPS.map((v) => tip(h('button.seg', {
       'aria-label': tr('Oyun hızını {0}x yap', v),
       'aria-pressed': String(s.settings.speed === v),
       onclick: () => this.pickSpeed(v),
@@ -150,7 +154,7 @@ export class HUD {
     } }), () => tr('Ses: <b>{0}</b>', s.settings.sound ? tr('Açık') : tr('Kapalı')));
     this.boostText = h('span.ctl-label');
     this.boostBtn = tip(h('button.ctl.boost-open', { 'aria-label': tr('Hızlandırma'), onclick: this.onBoost }, h('span', '⚡'), this.boostText), () => ({
-      title: tr('Hızlandırma'), desc: tr('30 dakika x2 altın ve +%25 saldırı hızı. Seçeneklerini görmek için tıkla.'),
+      title: tr('Hızlandırma'), desc: tr('30 dakika x2 altın. Seçeneklerini görmek için tıkla.'),
     }));
     this.heroCount = h('span.hud-hero-count');
     this.heroBtn = tip(h('button.ctl.hero-open', { 'aria-label': tr('Kahraman penceresini aç'), onclick: onOpenHero }, iconNode('🏹', 'control-art', 'bow'), h('span.ctl-label', tr('Kahraman')), this.heroCount), tr('Kahraman penceresi, envanter ve kuşanılan eşyalar'));
@@ -243,13 +247,17 @@ export class HUD {
 
     // Controls
     this.speedBtns.forEach((b, i) => {
-      const selected = g.gameSpeed === i + 1;
-      toggleClass(b, 'locked', i + 1 > g.speedLimit);
+      const selected = g.gameSpeed === SPEED_STEPS[i];
+      toggleClass(b, 'locked', SPEED_STEPS[i] > g.speedLimit);
       toggleClass(b, 'on', selected);
       b.setAttribute('aria-pressed', String(selected));
     });
     const boost = s.boostLeft ?? 0;
-    setText(this.boostText, boost > 0 ? `${Math.floor(boost / 60)}:${String(Math.floor(boost % 60)).padStart(2, '0')}` : tr('Hızlandır'));
+    setText(this.boostText, boost > 0 ? tr('x2 altın aktif') : tr('Hızlandır'));
+    // The timer surfaces beside the wave for 8 seconds each minute, not all the time
+    const flash = boost > 0 && boost % 60 < 8;
+    toggleClass(this.boostChip, 'hidden', !flash);
+    if (flash) setText(this.boostChip, tr('⚡ x2 altın · {0}:{1}', Math.floor(boost / 60), String(Math.floor(boost % 60)).padStart(2, '0')));
     toggleClass(this.boostBtn, 'on', boost > 0);
     setText(this.soundBtn, s.settings.sound ? '🔊' : '🔇');
     this.soundBtn.setAttribute('aria-label', s.settings.sound ? tr('Sesi kapat') : tr('Sesi aç'));

@@ -151,10 +151,12 @@ export class Game {
     this.cam.goto = clamp(offset, 0, this.cam.max);
   }
 
-  /** 2x opens at wave 10 of a run; 3x exists only while ad-bought time is left. */
+  /** Steps open as the run climbs (SPEED.steps); 3x exists only while ad-bought time is left. */
   get speedLimit() {
-    if ((this.state.fastLeft ?? 0) > 0) return 3;
-    return this.state.maxWave >= SPEED.wave2 ? 2 : 1;
+    if ((this.state.fastLeft ?? 0) > 0) return SPEED.fast;
+    let limit = 1;
+    for (const step of SPEED.steps) if (this.state.maxWave >= step.wave) limit = step.speed;
+    return limit;
   }
 
   get gameSpeed() {
