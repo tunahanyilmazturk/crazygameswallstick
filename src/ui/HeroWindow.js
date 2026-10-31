@@ -1,7 +1,9 @@
 import { h } from './dom.js';
 import { showModal } from './Modal.js';
 import { iconHtml } from './icons.js';
-import { fmt } from '../utils/format.js';
+import { fmt, fmtTime } from '../utils/format.js';
+import { AUTO_WEAR } from '../config/rewards.js';
+import { platform } from '../platform/platform.js';
 import { saveState } from '../core/State.js';
 import { bowCycle, drawArcher } from '../render/archer.js';
 import { UPGRADE_BY_ID } from '../config/upgrades.js';
@@ -304,6 +306,9 @@ export class HeroWindow {
       this.slotFilter = slot;
       this.render();
     },
+    'auto-wear'() {
+      this.game.onAutoWearRequest?.();
+    },
     'equip-best'() {
       const changed = this.equipBest();
       this.notice = changed ? tr('{0} yuvaya daha güçlü eşya kuşanıldı.', changed) : tr('Her yuvada en güçlü eşya zaten kuşanılı.');
@@ -463,12 +468,21 @@ export class HeroWindow {
     const { state } = this.game;
     const bonuses = getEquippedHeroBonuses(state);
     const totals = Object.keys(HERO_STAT_LABELS).filter((stat) => bonuses[stat] > 0);
-    return tr('<section class="inv-panel inv-character" aria-label="Karakter">\n      <div class="inv-doll">\n        <div class="inv-doll-col">{0}</div>\n        <div class="inv-doll-hero">\n          <canvas class="inv-hero-canvas" width="360" height="405" role="img" aria-label="Kuşanılan eşyalarıyla kahraman"></canvas>\n          {1}\n        </div>\n        <div class="inv-doll-col">{2}</div>\n      </div>\n      <button class="inv-btn gold wide" data-action="equip-best">✦ En Güçlüleri Kuşan</button>\n      <div class="inv-loadouts" aria-label="Kayıtlı takımlar">\n        {3}\n      </div>\n      <h4>Donanım katkısı</h4>\n      {4}\n    </section>', LEFT_SLOTS.map((id) => this.slotButton(SLOT_BY_ID[id])).join(''), this.slotButton(SLOT_BY_ID.charm), RIGHT_SLOTS.map((id) => this.slotButton(SLOT_BY_ID[id])).join(''), [0, 1, 2].map((i) => {
+    return tr('<section class="inv-panel inv-character" aria-label="Karakter">\n      <div class="inv-doll">\n        <div class="inv-doll-col">{0}</div>\n        <div class="inv-doll-hero">\n          <canvas class="inv-hero-canvas" width="360" height="405" role="img" aria-label="Kuşanılan eşyalarıyla kahraman"></canvas>\n          {1}\n        </div>\n        <div class="inv-doll-col">{2}</div>\n      </div>\n      <button class="inv-btn gold wide" data-action="equip-best">✦ En Güçlüleri Kuşan</button>\n      {5}\n      <div class="inv-loadouts" aria-label="Kayıtlı takımlar">\n        {3}\n      </div>\n      <h4>Donanım katkısı</h4>\n      {4}\n    </section>', LEFT_SLOTS.map((id) => this.slotButton(SLOT_BY_ID[id])).join(''), this.slotButton(SLOT_BY_ID.charm), RIGHT_SLOTS.map((id) => this.slotButton(SLOT_BY_ID[id])).join(''), [0, 1, 2].map((i) => {
           const saved = state.heroLoadouts?.[i];
           return tr('<div class="inv-loadout">\n            <button class="inv-btn" data-action="loadout-use" data-index="{0}" {1} title="{2}">Takım {3}</button>\n            <button class="inv-btn mini" data-action="loadout-save" data-index="{4}" title="Şu an kuşanılanları Takım {5} olarak kaydet" aria-label="Takım {6} kaydet">⤓</button>\n          </div>', i, saved ? '' : 'disabled', saved ? tr('Bu takımı kuşan') : tr('Henüz kaydedilmedi'), i + 1, i, i + 1, i + 1);
         }).join(''), totals.length
         ? `<ul class="inv-stat-list">${totals.map((stat) => `<li>${describeHeroStat(stat, bonuses[stat])}</li>`).join('')}</ul>`
-        : tr('<p class="inv-muted">Henüz eşya kuşanmadın.</p>'));
+        : tr('<p class="inv-muted">Henüz eşya kuşanmadın.</p>'), this.autoWearButton());
+  }
+
+  /** Otomatik Kuşanma: hidden without ads; while it runs the button shows the time left. */
+  autoWearButton() {
+    if (!platform.adsOn) return '';
+    const left = this.game.state.autoWearLeft ?? 0;
+    return left > 0
+      ? tr('<button class="inv-btn wide on" data-action="auto-wear">⏱ Otomatik kuşanma · {0}</button>', fmtTime(left))
+      : tr('<button class="inv-btn wide" data-action="auto-wear">🎬 Otomatik kuşanma · {0} dk</button>', AUTO_WEAR.seconds / 60);
   }
 
   renderGrid() {

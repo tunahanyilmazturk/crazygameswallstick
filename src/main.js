@@ -49,6 +49,8 @@ const offers = new Offers(modalRoot, game, (t) => toasts.show(t));
 const coach = new Coach(viewport, game, shop);
 game.onVipTap = () => offers.openVip();
 game.onVipArrive = () => toasts.show({ icon: '👑', title: tr('VIP Elçi geldi!'), sub: tr('Kale penceresindeki elçiye tıkla') });
+game.onVillageEvent = (def) => toasts.show({ icon: def.icon, title: def.name, sub: def.desc });
+game.onAutoWearRequest = () => offers.openAutoWear();
 platform.watchMute((muted) => { game.audio.muted = muted; });
 
 /** Ara reklam, only after a boss falls: the natural pause in the climb. */

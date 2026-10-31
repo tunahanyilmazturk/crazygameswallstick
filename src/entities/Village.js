@@ -1,7 +1,7 @@
 import { GROUND_Y, WORLD_W } from '../core/constants.js';
 import { rand } from '../utils/math.js';
 import { fmt } from '../utils/format.js';
-import { VILLAGE_SITES, DEPOT_X, MOUNTAIN_ROAD, CAMP_Y, MINE } from '../config/village.js';
+import { VILLAGE_SITES, VILLAGE_EVENTS, VILLAGE_EVENT, DEPOT_X, MOUNTAIN_ROAD, CAMP_Y, MINE } from '../config/village.js';
 import { villageColors, drawMountain, drawRoad, drawSite, drawDepot, drawMarket, drawWorker } from '../render/villageArt.js';
 
 /*
@@ -119,6 +119,7 @@ export class Village {
     this.hoistQueue = 0;
     this.hoist = { k: 0, up: false, busy: false };
     this.orePile = 0;
+    this.payMult = 1; // village event multiplier on every delivery
   }
 
   /** Match worker counts and building levels to the current stats. */
@@ -135,7 +136,7 @@ export class Village {
   }
 
   deliver(amount, atCart = true) {
-    this.pending += amount;
+    this.pending += amount * this.payMult;
     if (atCart) this.cartBump = 0.3;
   }
 
@@ -161,10 +162,28 @@ export class Village {
     }
   }
 
+  /** Village events: a short spell of extra pay, timed by play time like the VIP visit. */
+  updateEvents(game) {
+    const s = game.state;
+    s.villageEventNext ??= s.playTime + VILLAGE_EVENT.firstAfter;
+    const ev = s.villageEvent;
+    if (ev && s.playTime >= ev.until) {
+      s.villageEvent = null;
+      s.villageEventNext = s.playTime + VILLAGE_EVENT.every;
+    } else if (!ev && s.playTime >= s.villageEventNext && Object.values(this.levels).some(Boolean)) {
+      const def = VILLAGE_EVENTS[Math.floor(Math.random() * VILLAGE_EVENTS.length)];
+      s.villageEvent = { key: def.key, until: s.playTime + def.seconds };
+      game.onVillageEvent?.(def);
+    }
+    const active = s.villageEvent && VILLAGE_EVENTS.find((e) => e.key === s.villageEvent.key);
+    this.payMult = active ? active.mult : 1;
+  }
+
   update(dt, game) {
     this.t += dt;
     this.cartBump = Math.max(0, this.cartBump - dt);
     this.updateHoist(dt);
+    this.updateEvents(game);
     const vs = game.stats.village;
     for (const site of VILLAGE_SITES) {
       for (const w of this.workers[site.key]) w.update(dt, this, vs[site.key].rate);

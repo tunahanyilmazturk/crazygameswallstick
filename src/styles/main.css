@@ -1858,3 +1858,55 @@ button:focus-visible, [role="dialog"]:focus-visible {
 
 .seg.locked { opacity: 0.45; }
 .wave-chip.boost { color: #ffe08a; }
+
+/* Statistics: headline tiles, progress bars and the run history */
+.mm-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+.mm-tile {
+  padding: 8px 6px;
+  border-radius: 9px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(226, 179, 60, 0.16), rgba(0, 0, 0, 0.25));
+  border: 1px solid rgba(226, 179, 60, 0.28);
+}
+.mm-tile small { display: block; color: var(--muted); font-size: 11px; }
+.mm-tile b { color: #ffe08a; font-size: 16px; }
+.mm-bar-row { position: relative; overflow: hidden; }
+.mm-bar-row i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: var(--p);
+  background: linear-gradient(90deg, #e2b33c, #ffd34d);
+}
+.mm-runs { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+.mm-run {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+}
+.mm-run small { grid-column: 1 / -1; color: var(--muted); font-size: 11px; }
+.mm-muted { color: var(--muted); font-size: 12px; }
+@media (max-width: 600px) { .mm-tiles { grid-template-columns: repeat(2, 1fr); } }
+
+/* Yenilikler: item kind tags */
+.mm-tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-style: normal;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  vertical-align: 1px;
+  color: #fff;
+  background: #2f5f8a;
+}
+.mm-tag.new { background: #2f7d4a; }
+.mm-tag.balance { background: #8a4b1f; }
+.mm-tag.fix { background: #5a3a7a; }
+.mm-tag.latest { background: var(--gold); color: #2a1d05; margin-right: 6px; }

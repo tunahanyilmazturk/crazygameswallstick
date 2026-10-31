@@ -255,6 +255,21 @@ export function codexProgress(state) {
   return { found, total: Object.keys(HERO_ITEM_TEMPLATES).length, damage: found * CODEX_DAMAGE, perPiece: CODEX_DAMAGE };
 }
 
+/**
+ * Otomatik Kuşanma: wears a freshly dropped piece when it beats what its slot holds now.
+ * Returns true when it was put on. Does nothing unless the timer is running.
+ */
+export function autoWearItem(state, item, critMult = 1.5) {
+  if (!((state.autoWearLeft ?? 0) > 0)) return false;
+  const slot = getHeroItemSlot(item)?.id;
+  if (!slot) return false;
+  const worn = state.heroInventory.find((candidate) => candidate.id === state.heroEquipment?.[slot]);
+  if (worn && heroItemScore(worn, critMult) >= heroItemScore(item, critMult)) return false;
+  state.heroEquipment ??= {};
+  state.heroEquipment[slot] = item.id;
+  return true;
+}
+
 /** Otomatik Satış: rank is how many rarities are sold on sight. Set pieces and new finds stay. */
 export function shouldAutoSell(state, item) {
   const rank = RARITIES.indexOf(rarityOf(item.rarity));

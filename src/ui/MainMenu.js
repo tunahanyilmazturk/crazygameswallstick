@@ -5,6 +5,8 @@ import { biomeForWave } from '../render/biomes.js';
 import { ACHIEVEMENTS, achievementCount } from '../config/achievements.js';
 import { CHANGELOG, VERSION } from '../config/changelog.js';
 import { estimateDps } from '../systems/Stats.js';
+import { codexProgress, getHeroSetProgress } from '../systems/HeroItems.js';
+import { oathById } from '../config/oaths.js';
 import { chooseLanguage, language } from '../i18n/i18n.js';
 import { tr } from '../i18n/i18n.js';
 
@@ -154,8 +156,18 @@ export class MainMenu {
     const c = s.counters ?? {};
     const st = this.game.stats;
     const row = (k, v) => `<div class="mm-stat"><span>${k}</span><b>${v}</b></div>`;
+    const bar = (k, n, total) => `<div class="mm-stat mm-bar-row"><span>${k}</span><b>${fmt(n)} / ${fmt(total)}</b><i style="--p:${total ? Math.min(100, (n / total) * 100) : 0}%"></i></div>`;
     const group = (title, rows) => `<div class="mm-section">${title}</div><div class="mm-stats">${rows.join('')}</div>`;
-    return tr('<h2 class="mm-title">İstatistikler</h2>\n      <div class="mm-scroll">\n        {0}\n        {1}\n        {2}\n        {3}\n      </div>\n      <nav class="mm-buttons"><button class="mm-btn" data-action="back">‹ Geri</button></nav>', group(tr('⚔️ Savaş'), [
+    const tile = (icon, k, v) => `<div class="mm-tile"><small>${icon} ${k}</small><b>${v}</b></div>`;
+    const codex = codexProgress(s);
+    const sets = getHeroSetProgress(s);
+    const doneSets = sets.filter((set) => set.count >= set.pieces.length).length;
+    const runs = s.prestigeLog ?? [];
+    const history = runs.length
+      ? runs.map((run) => `<div class="mm-run"><span>${tr('Dalga {0}', run.wave)}</span><b>💎 ${fmt(run.souls)}</b><small>${fmtTime(run.time ?? 0)} · ${oathById(run.oath).name}</small></div>`).join('')
+      : tr('<p class="mm-muted">Henüz Yeniden Doğuş yok.</p>');
+    const tiles = `<div class="mm-tiles">${tile('🌊', tr('En iyi dalga'), s.bestWave)}${tile('💰', tr('Toplam altın'), fmt(s.totalGold))}${tile('⏳', tr('Oynama süresi'), fmtTime(s.playTime))}${tile('🔁', tr('Yeniden doğuş'), s.prestiges)}</div>`;
+    return tr('<h2 class="mm-title">İstatistikler</h2>\n      <div class="mm-scroll">\n        {0}\n        {1}\n        {2}\n        {3}\n      </div>\n      <nav class="mm-buttons"><button class="mm-btn" data-action="back">‹ Geri</button></nav>', tiles + group(tr('⚔️ Savaş'), [
           row(tr('En iyi dalga'), s.bestWave),
           row(tr('Öldürülen düşman'), fmt(s.kills)),
           row(tr('Yenilen Savaş Lordu'), fmt(c.bossKills ?? 0)),
@@ -170,7 +182,9 @@ export class MainMenu {
           row(tr('Köy geliri'), tr('{0}/sn', fmt(st.village.total))),
           row(tr('Toplam Elmas'), fmt(s.totalGems ?? 0)),
         ]), group(tr('🏆 Koleksiyon'), [
-          row(tr('Başarımlar'), `${achievementCount(s)} / ${ACHIEVEMENTS.length}`),
+          bar(tr('Başarımlar'), achievementCount(s), ACHIEVEMENTS.length),
+          bar(tr('Eşya kütüphanesi'), codex.found, codex.total),
+          row(tr('Tamamlanan set'), `${doneSets} / ${sets.length}`),
           row(tr('Bulunan eşya'), fmt(c.itemsFound ?? 0)),
           row(tr('Efsanevi eşya'), fmt(c.legendaries ?? 0)),
           row(tr('Kullanılan yetenek'), fmt(c.skillCasts ?? 0)),
@@ -179,7 +193,7 @@ export class MainMenu {
           row(tr('Yeniden doğuş'), s.prestiges),
           row(tr('Toplam Ruh Taşı'), fmt(s.totalSouls)),
           row(tr('Kale düştü'), fmt(c.castleFalls ?? 0)),
-        ]));
+        ]) + `<div class="mm-section">${tr('Yolculuk geçmişi')}</div><div class="mm-runs">${history}</div>`);
   }
 
   view_keys() {
@@ -193,9 +207,10 @@ export class MainMenu {
       s.seenVersion = VERSION;
       saveState(s);
     }
-    return tr('<h2 class="mm-title">Yenilikler</h2>\n      <div class="mm-scroll">\n        {0}\n      </div>\n      <nav class="mm-buttons"><button class="mm-btn" data-action="back">‹ Geri</button></nav>', CHANGELOG.map((rel) => `<div class="mm-release">
-          <div class="mm-release-head"><b>${rel.title}</b><span>${rel.version}</span></div>
-          <ul>${rel.items.map(([icon, text]) => `<li><i>${icon}</i><span>${text}</span></li>`).join('')}</ul>
+    const KIND_LABEL = { new: tr('YENİ'), balance: tr('DENGE'), change: tr('İYİLEŞTİRME'), fix: tr('DÜZELTME') };
+    return tr('<h2 class="mm-title">Yenilikler</h2>\n      <div class="mm-scroll">\n        {0}\n      </div>\n      <nav class="mm-buttons"><button class="mm-btn" data-action="back">‹ Geri</button></nav>', CHANGELOG.map((rel, i) => `<div class="mm-release">
+          <div class="mm-release-head"><b>${rel.title}</b><span>${i === 0 ? `<em class="mm-tag latest">${tr('SON')}</em>` : ''}${rel.version}${rel.date ? ` · ${rel.date}` : ''}</span></div>
+          <ul>${rel.items.map(([icon, text, kind = 'change']) => `<li><i>${icon}</i><span><em class="mm-tag ${kind}">${KIND_LABEL[kind]}</em>${text}</span></li>`).join('')}</ul>
         </div>`).join(''));
   }
 

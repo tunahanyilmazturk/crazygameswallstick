@@ -27,7 +27,7 @@ import { CastleBar } from '../render/castleBar.js';
 import { bossGems, GEM_MILESTONES, PRESTIGE_GEMS } from '../config/skills.js';
 import { fmt } from '../utils/format.js';
 import { rand, lerp, clamp, ballistic } from '../utils/math.js';
-import { rollHeroItem, getHeroItemTemplate, getHeroItemRarity, heroItemSellValue, heroItemEssence, recordDiscovery, shouldAutoSell } from '../systems/HeroItems.js';
+import { rollHeroItem, getHeroItemTemplate, getHeroItemRarity, heroItemSellValue, heroItemEssence, recordDiscovery, shouldAutoSell, autoWearItem } from '../systems/HeroItems.js';
 import { inventoryCapacity } from '../systems/Economy.js';
 import { language, tr } from '../i18n/i18n.js';
 
@@ -250,6 +250,7 @@ export class Game {
     this.vip.update(dt, this);
     // Hızlandırma counts real playing time, whatever the game speed
     if (s.boostLeft > 0) s.boostLeft = Math.max(0, s.boostLeft - dt / this.gameSpeed);
+    if ((s.autoWearLeft ?? 0) > 0) s.autoWearLeft = Math.max(0, s.autoWearLeft - dt / this.gameSpeed);
     if ((s.fastLeft ?? 0) > 0) {
       s.fastLeft = Math.max(0, s.fastLeft - dt / this.gameSpeed);
       if (s.fastLeft === 0 && s.settings.speed > this.speedLimit) s.settings.speed = this.speedLimit;
@@ -490,6 +491,10 @@ export class Game {
       if (!autoSold && this.state.heroInventory.length < inventoryCapacity(this.state)) {
         item.fresh = true; // marked YENİ in the inventory until the window is opened and closed
         this.state.heroInventory.push(item);
+        if (autoWearItem(this.state, item, this.stats.hero.critMult ?? 1.5)) {
+          this.refreshStats();
+          this.effects.text(e.x, e.y - e.h - 66, tr('Kuşanıldı'), '#7fe6ff', 14);
+        }
         this.effects.text(e.x, e.y - e.h - 48, `✦ ${this.itemName(item)}`, rarity.id === 'common' ? '#9fe3ff' : rarity.color, e.boss ? 22 : 16);
         this.onItemDrop?.(item);
       } else {

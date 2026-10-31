@@ -40,6 +40,12 @@ export const SPEED = {
   maxSeconds: 3600,
 };
 
+/** Otomatik Kuşanma: while it runs, each dropped piece that beats what is worn gets worn. */
+export const AUTO_WEAR = {
+  seconds: 1800,
+  maxSeconds: 3600,
+};
+
 /** Yenilgi Ganimeti: after the castle falls, an ad can turn the setback into gold. */
 export const FALL_RELIEF = {
   firstAfter: 300,   // seconds of play before it can show

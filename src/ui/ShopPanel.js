@@ -8,7 +8,7 @@ import {
   HERO_UPGRADES, CASTLE_UPGRADES, ALLY_UPGRADES, VILLAGE_UPGRADES, SOUL_UPGRADES, UPGRADE_BY_ID,
   PRESTIGE_MIN_WAVE, MAX_WORKERS, soulsForWave, nextSoulWave, nextMilestone,
 } from '../config/upgrades.js';
-import { VILLAGE_SITES } from '../config/village.js';
+import { VILLAGE_EVENTS, VILLAGE_SITES } from '../config/village.js';
 import { quote, purchase, levelOf, walletOf, displayCost, maxLevel, currencyIcon, inventoryCapacity } from '../systems/Economy.js';
 import { ACTIVE_SKILLS, TALENTS, TALENT_BRANCHES, TALENT_TIERS, GEM_SOURCES } from '../config/skills.js';
 import { saveState } from '../core/State.js';
@@ -890,6 +890,9 @@ export class ShopPanel {
         ['🏪', `x${v.mult.toFixed(2)}`, tr('Toplam köy çarpanı: Pazar Yeri × Köy Bereketi × Altın Ruhu')],
         ['🧱', tr('+{0}/sn', v.quarry.repair.toFixed(2)), tr('Taş ustalarının kaleye sağladığı ek onarım')],
       ];
+      const event = this.game.state.villageEvent;
+      const def = event && VILLAGE_EVENTS.find((e) => e.key === event.key);
+      if (def) pills.push([def.icon, 'x' + def.mult + ' · ' + fmtTime(Math.max(0, event.until - this.game.state.playTime)), def.desc]);
       const activeChains = v.chains.filter((chain) => chain.bonus > 0);
       pills.push(['🔗', tr('{0}/{1} üretim bağı', activeChains.length, VILLAGE_CHAINS.length), {
         icon: '🔗', title: tr('Köy üretim zincirleri'),

@@ -35,7 +35,10 @@ export function createDefaultState() {
     heroEquipment: Object.fromEntries(HERO_ITEM_SLOTS.map(({ id }) => [id, null])),
     boostLeft: 0,      // seconds of Hızlandırma left (config/rewards.js)
     fastLeft: 0,       // seconds of ad-bought 3x speed left (config/rewards.js SPEED)
+    autoWearLeft: 0,   // seconds of ad-bought auto-wear left (config/rewards.js AUTO_WEAR)
     vipNext: null,     // playTime of the VIP Elçi's next visit
+    villageEvent: null,     // { key, until } while a village event pays extra
+    villageEventNext: null, // playTime of the next village event
     coachStep: 0,      // first-minutes hints (ui/Coach.js)
     oath: 'none',      // Yemin sworn for this run (config/oaths.js)
     nextOath: 'none',  // Yemin the next Yeniden Doğuş will start

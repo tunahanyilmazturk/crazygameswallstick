@@ -84,3 +84,15 @@ export const VILLAGE_CHAINS = [
 /** Level thresholds where every site gains a visible upgrade (props, pennant, gold sign). */
 export const VILLAGE_TIERS = [5, 10, 25];
 export const villageTier = (level) => VILLAGE_TIERS.filter((t) => level >= t).length;
+
+/**
+ * Köy olayları: now and then a passing event multiplies what the village pays for a short
+ * while. `seconds` is play time; when events come is set in VILLAGE_EVENT.
+ */
+export const VILLAGE_EVENTS = [
+  { key: 'market', name: tr('Pazar Günü'), icon: '🛒', mult: 1.5, seconds: 60, desc: tr('Pazar yeri kalabalık: köy geliri x{0}', 1.5) },
+  { key: 'caravan', name: tr('Tüccar Kervanı'), icon: '🐪', mult: 2, seconds: 30, desc: tr('Kervan geçiyor: köy geliri x{0}', 2) },
+  { key: 'feast', name: tr('Hasat Şenliği'), icon: '🎉', mult: 1.25, seconds: 120, desc: tr('Köyde şenlik var: köy geliri x{0}', 1.25) },
+];
+/** Play time before the first event, and between events once one has ended. */
+export const VILLAGE_EVENT = { firstAfter: 240, every: 420 };

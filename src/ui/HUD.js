@@ -259,6 +259,7 @@ export class HUD {
     toggleClass(this.boostChip, 'hidden', !flash);
     if (flash) setText(this.boostChip, tr('⚡ x2 altın · {0}:{1}', Math.floor(boost / 60), String(Math.floor(boost % 60)).padStart(2, '0')));
     toggleClass(this.boostBtn, 'on', boost > 0);
+    toggleClass(this.heroBtn, 'on', (s.autoWearLeft ?? 0) > 0);
     setText(this.soundBtn, s.settings.sound ? '🔊' : '🔇');
     this.soundBtn.setAttribute('aria-label', s.settings.sound ? tr('Sesi kapat') : tr('Sesi aç'));
     setText(this.advIcon, s.settings.autoAdvance ? '⏩' : '🔁');

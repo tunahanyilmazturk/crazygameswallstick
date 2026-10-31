@@ -3,7 +3,7 @@ import { showModal } from './Modal.js';
 import { fmt, fmtTime } from '../utils/format.js';
 import { saveState } from '../core/State.js';
 import { platform } from '../platform/platform.js';
-import { BOOST, FALL_RELIEF, SPEED, VIP } from '../config/rewards.js';
+import { AUTO_WEAR, BOOST, FALL_RELIEF, SPEED, VIP } from '../config/rewards.js';
 import { tr } from '../i18n/i18n.js';
 
 const NO_AD = tr('Şu an reklam yok, biraz sonra yine dene.');
@@ -129,6 +129,30 @@ export class Offers {
     saveState(s);
     this.game.audio.play('charge');
     this.toast({ icon: '⏩', title: tr('3x hız açıldı!'), sub: tr('+{0} dk 3x oyun hızı', SPEED.fastSeconds / 60) });
+  }
+
+  /** Otomatik Kuşanma, bought only with ads: timed, and it wears every better drop. */
+  openAutoWear() {
+    const s = this.game.state;
+    if (!platform.adsOn) return;
+    const left = s.autoWearLeft ?? 0;
+    const intro = tr('Reklam izledikçe {0} dakika boyunca düşen her eşya, kuşanılandan güçlüyse otomatik kuşanılır. Süre yalnızca oynarken işler. En fazla {1} dakika birikir.', AUTO_WEAR.seconds / 60, AUTO_WEAR.maxSeconds / 60);
+    this.window(tr('🛡️ Otomatik Kuşanma'), left > 0 ? tr('Şu an {0} kaldı. ', fmtTime(left)) + intro : intro, [
+      {
+        label: tr('🎬 Reklam izle: +{0} dk', AUTO_WEAR.seconds / 60),
+        disabled: left >= AUTO_WEAR.maxSeconds,
+        run: (close, note) => this.watch(close, note, () => this.grantAutoWear()),
+      },
+      { label: tr('Vazgeç'), run: (close) => close() },
+    ]);
+  }
+
+  grantAutoWear() {
+    const s = this.game.state;
+    s.autoWearLeft = Math.min(AUTO_WEAR.maxSeconds, (s.autoWearLeft ?? 0) + AUTO_WEAR.seconds);
+    saveState(s);
+    this.game.audio.play('charge');
+    this.toast({ icon: '🛡️', title: tr('Otomatik kuşanma açıldı!'), sub: tr('+{0} dk, düşen eşyalar kuşanılır', AUTO_WEAR.seconds / 60) });
   }
 
   /** Shown after a fall: an ad turns the setback into gold. Skipped when ads are off. */
